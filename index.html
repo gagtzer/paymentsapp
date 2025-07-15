@@ -23,7 +23,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 500px; /* Αυξήθηκε το μέγιστο πλάτος για το ιστορικό */
+            max-width: 500px;
             text-align: center;
         }
         h1 {
@@ -120,8 +120,8 @@
         .history-list {
             list-style-type: none;
             padding: 0;
-            max-height: 200px; /* Περιορισμός ύψους για κύλιση */
-            overflow-y: auto; /* Ενεργοποίηση κύλισης */
+            max-height: 200px;
+            overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 4px;
             background-color: #fdfdfd;
@@ -131,6 +131,9 @@
             border-bottom: 1px solid #eee;
             font-size: 0.95em;
             color: #444;
+            display: flex; /* Για να ευθυγραμμιστεί το κείμενο και το κουμπί */
+            justify-content: space-between; /* Για να σπρώξει το κουμπί δεξιά */
+            align-items: center;
         }
         .history-list li:last-child {
             border-bottom: none;
@@ -144,6 +147,20 @@
         .history-list li span.description {
             font-style: italic;
             color: #777;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 8px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+            flex-shrink: 0; /* Αποτρέπει το κουμπί να συρρικνωθεί */
+        }
+        .delete-button:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
@@ -209,7 +226,7 @@
 
         <div class="history-section">
             <h2 class="section-title">Ιστορικό Συναλλαγών</h2>
-            <ul id="transactionHistory" class="history-list">
+            <ul id="transactionHistoryList" class="history-list">
                 </ul>
         </div>
 
@@ -219,7 +236,8 @@
     <script>
         let thanasisTotal = 0;
         let ersiTotal = 0;
-        let transactionHistory = []; // Array to store transaction history
+        // Το transactionHistory θα αποθηκεύει πλέον αντικείμενα με όλες τις λεπτομέρειες της συναλλαγής
+        let transactionHistory = [];
 
         // Load totals and history from local storage on page load
         window.onload = function() {
@@ -250,25 +268,28 @@
                 return;
             }
 
-            let transactionText = '';
+            // Καταγραφή της συναλλαγής με όλα τα δεδομένα
+            const transaction = {
+                type: 'payment',
+                amount: amount,
+                from: payer, // Για πληρωμή, ο "from" είναι ο πληρωτής
+                to: null,    // Δεν υπάρχει παραλήπτης στην πληρωμή
+                description: description,
+                timestamp: new Date().toISOString() // Αποθήκευση ως ISO string για συμβατότητα
+            };
+
             if (payer === 'thanasis') {
                 thanasisTotal += amount;
-                transactionText = `Πληρωμή: ${amount.toFixed(2)}€ από Θανάση`;
             } else if (payer === 'ersi') {
                 ersiTotal += amount;
-                transactionText = `Πληρωμή: ${amount.toFixed(2)}€ από Έρση`;
             }
 
-            if (description) {
-                transactionText += ` (${description})`;
-            }
-
-            transactionHistory.push({ type: 'payment', text: transactionText });
+            transactionHistory.push(transaction);
             saveData();
             updateDisplay();
             renderHistory();
-            amountInput.value = ''; // Clear the amount input after adding
-            descriptionInput.value = ''; // Clear the description input
+            amountInput.value = '';
+            descriptionInput.value = '';
         }
 
         function transferFunds() {
@@ -292,35 +313,82 @@
                 return;
             }
 
-            let transactionText = '';
+            let canTransfer = true;
             if (fromUser === 'thanasis') {
                 if (thanasisTotal < amount) {
                     alert('Ο Θανάσης δεν έχει επαρκές ποσό για αυτή τη μεταφορά.');
-                    return;
+                    canTransfer = false;
                 }
-                thanasisTotal -= amount;
-                ersiTotal += amount;
-                transactionText = `Μεταφορά: ${amount.toFixed(2)}€ από Θανάση προς Έρση`;
             } else if (fromUser === 'ersi') {
                 if (ersiTotal < amount) {
                     alert('Η Έρση δεν έχει επαρκές ποσό για αυτή τη μεταφορά.');
-                    return;
+                    canTransfer = false;
                 }
+            }
+
+            if (!canTransfer) return;
+
+            // Καταγραφή της μεταφοράς
+            const transaction = {
+                type: 'transfer',
+                amount: amount,
+                from: fromUser,
+                to: toUser,
+                description: description,
+                timestamp: new Date().toISOString()
+            };
+
+            // Προσαρμόζουμε τα σύνολα
+            if (fromUser === 'thanasis') {
+                thanasisTotal -= amount;
+                ersiTotal += amount;
+            } else if (fromUser === 'ersi') {
                 ersiTotal -= amount;
                 thanasisTotal += amount;
-                transactionText = `Μεταφορά: ${amount.toFixed(2)}€ από Έρση προς Θανάση`;
             }
 
-            if (description) {
-                transactionText += ` (${description})`;
-            }
-
-            transactionHistory.push({ type: 'transfer', text: transactionText });
+            transactionHistory.push(transaction);
             saveData();
             updateDisplay();
             renderHistory();
-            transferAmountInput.value = ''; // Clear the transfer amount input
-            transferDescriptionInput.value = ''; // Clear the transfer description input
+            transferAmountInput.value = '';
+            transferDescriptionInput.value = '';
+        }
+
+        function deleteTransaction(index) {
+            // Επιβεβαίωση διαγραφής
+            if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή τη συναλλαγή;')) {
+                return;
+            }
+
+            const transactionToDelete = transactionHistory[index];
+
+            if (transactionToDelete.type === 'payment') {
+                // Αν ήταν πληρωμή, αφαιρούμε το ποσό από τον πληρωτή
+                if (transactionToDelete.from === 'thanasis') {
+                    thanasisTotal -= transactionToDelete.amount;
+                } else if (transactionToDelete.from === 'ersi') {
+                    ersiTotal -= transactionToDelete.amount;
+                }
+            } else if (transactionToDelete.type === 'transfer') {
+                // Αν ήταν μεταφορά, αντιστρέφουμε τη μεταφορά
+                // Δηλαδή, προσθέτουμε το ποσό πίσω στον αποστολέα
+                // και αφαιρούμε από τον παραλήπτη
+                if (transactionToDelete.from === 'thanasis') {
+                    thanasisTotal += transactionToDelete.amount;
+                    ersiTotal -= transactionToDelete.amount;
+                } else if (transactionToDelete.from === 'ersi') {
+                    ersiTotal += transactionToDelete.amount;
+                    thanasisTotal -= transactionToDelete.amount;
+                }
+            }
+
+            // Αφαιρούμε τη συναλλαγή από τον πίνακα
+            transactionHistory.splice(index, 1);
+
+            saveData();
+            updateDisplay();
+            renderHistory();
         }
 
         function updateDisplay() {
@@ -329,13 +397,39 @@
         }
 
         function renderHistory() {
-            const historyList = document.getElementById('transactionHistory');
+            const historyList = document.getElementById('transactionHistoryList');
             historyList.innerHTML = ''; // Clear existing history
 
-            transactionHistory.forEach(item => {
+            transactionHistory.forEach((transaction, index) => {
                 const listItem = document.createElement('li');
-                listItem.textContent = item.text;
-                listItem.classList.add(item.type); // Add class for styling (e.g., 'payment' or 'transfer')
+                let transactionText = '';
+
+                if (transaction.type === 'payment') {
+                    transactionText = `Πληρωμή: ${transaction.amount.toFixed(2)}€ από ${transaction.from === 'thanasis' ? 'Θανάση' : 'Έρση'}`;
+                    listItem.classList.add('payment');
+                } else if (transaction.type === 'transfer') {
+                    transactionText = `Μεταφορά: ${transaction.amount.toFixed(2)}€ από ${transaction.from === 'thanasis' ? 'Θανάση' : 'Έρση'} προς ${transaction.to === 'thanasis' ? 'Θανάση' : 'Έρση'}`;
+                    listItem.classList.add('transfer');
+                }
+
+                if (transaction.description) {
+                    transactionText += ` (${transaction.description})`;
+                }
+                
+                // Προσθήκη timestamp για καλύτερη αναγνώριση
+                const date = new Date(transaction.timestamp);
+                transactionText += ` - ${date.toLocaleString('el-GR')}`;
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = transactionText;
+                listItem.appendChild(textSpan);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Διαγραφή';
+                deleteBtn.classList.add('delete-button');
+                deleteBtn.onclick = () => deleteTransaction(index); // Αντιστοίχιση της συνάρτησης διαγραφής
+                listItem.appendChild(deleteBtn);
+
                 historyList.appendChild(listItem);
             });
             historyList.scrollTop = historyList.scrollHeight; // Scroll to the bottom of the list
