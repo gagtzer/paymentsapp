@@ -1,447 +1,160 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Καταγραφή Πληρωμών</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 25px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: bold;
-        }
-        .input-group input[type="number"],
-        .input-group input[type="text"],
-        .input-group select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .input-group input[type="number"]:focus,
-        .input-group input[type="text"]:focus,
-        .input-group select:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 17px;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .results {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        .results p {
-            font-size: 1.1em;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .results p strong {
-            color: #007bff;
-        }
-        .reset-button {
-            background-color: #dc3545;
-            margin-top: 20px;
-        }
-        .reset-button:hover {
-            background-color: #c82333;
-        }
-        .section-title {
-            margin-top: 30px;
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 1.3em;
-            font-weight: bold;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        .transfer-section {
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            margin-top: 30px;
-        }
-        .transfer-button {
-            background-color: #28a745;
-        }
-        .transfer-button:hover {
-            background-color: #218838;
-        }
-        .history-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            text-align: left;
-        }
-        .history-list {
-            list-style-type: none;
-            padding: 0;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            background-color: #fdfdfd;
-        }
-        .history-list li {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.95em;
-            color: #444;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .history-list li:last-child {
-            border-bottom: none;
-        }
-        .history-list li.payment {
-            color: #007bff;
-        }
-        .history-list li.transfer {
-            color: #28a745;
-        }
-        .history-list li span.description {
-            font-style: italic;
-            color: #777;
-        }
-        .delete-button {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 3px 6px; /* Μειωμένο padding για μικρότερο πλάτος */
-            cursor: pointer;
-            font-size: 0.75em; /* Ελαφρώς μικρότερο μέγεθος γραμματοσειράς */
-            margin-left: 10px;
-            flex-shrink: 0;
-        }
-        .delete-button:hover {
-            background-color: #c82333;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Θανάσης + Έρση = LFE</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      /* Ροζ διαβαθμισμένο φόντο (προσαρμόζεις τα χρώματα όπως θες) */
+      background: linear-gradient(135deg, #ffc1cc 0%, #ffb7e7 50%, #ffd1dc 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #mainText {
+      font-size: 3rem;
+      color: #7a1f4c;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 2s ease;
+      font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+      letter-spacing: 2px;
+      z-index: 2;
+    }
+
+    /* Κλείδωμα στο κέντρο */
+    #centerContainer {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* Ζώνη για το canvas πυροτεχνημάτων πίσω από το κείμενο */
+    #fireworks {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Καταγραφή Πληρωμών</h1>
+  <canvas id="fireworks"></canvas>
+  <div id="centerContainer">
+    <div id="mainText">Θανάσης + Έρση = LFE</div>
+  </div>
+  <script>
+    // Σταδιακή εμφάνιση κειμένου
+    const mainText = document.getElementById('mainText');
+    setTimeout(() => {
+      mainText.style.opacity = '1';
+      setTimeout(() => { startFireworks(); }, 2500); // εκκίνηση πυροτεχνημάτων μετά το fade-in
+    }, 800);
 
-        <div class="input-group">
-            <label for="amount">Ποσό Πληρωμής (€):</label>
-            <input type="number" id="amount" min="0.01" step="0.01" placeholder="Εισάγετε ποσό" required>
-        </div>
+    // Πυροτεχνήματα με Canvas
+    function randomColor() {
+      const colors = [
+        '#ff3cac', '#784ba0', '#ffb7e7', '#fecfef', '#b721ff',
+        '#f6d365', '#fccb90', '#ff5e62', '#7ee8fa', '#eec0c6'
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
 
-        <div class="input-group">
-            <label for="payer">Ποιος πλήρωσε:</label>
-            <select id="payer">
-                <option value="thanasis">Θανάσης</option>
-                <option value="ersi">Έρση</option>
-            </select>
-        </div>
+    function startFireworks() {
+      const canvas = document.getElementById('fireworks');
+      const ctx = canvas.getContext('2d');
+      resizeCanvas();
 
-        <div class="input-group">
-            <label for="paymentDescription">Περιγραφή Πληρωμής:</label>
-            <input type="text" id="paymentDescription" placeholder="Π.χ. Ενοίκιο, λογαριασμοί">
-        </div>
+      window.addEventListener('resize', resizeCanvas);
 
-        <button onclick="addPayment()">Προσθήκη Πληρωμής</button>
+      let fireworks = [];
 
-        <div class="results">
-            <p>Σύνολο Πληρωμών Θανάση: <strong id="thanasisTotal">0.00€</strong></p>
-            <p>Σύνολο Πληρωμών Έρσης: <strong id="ersiTotal">0.00€</strong></p>
-        </div>
-
-        <div class="transfer-section">
-            <h2 class="section-title">Μεταφορά Ποσού</h2>
-            <div class="input-group">
-                <label for="transferAmount">Ποσό Μεταφοράς (€):</label>
-                <input type="number" id="transferAmount" min="0.01" step="0.01" placeholder="Εισάγετε ποσό" required>
-            </div>
-
-            <div class="input-group">
-                <label for="transferFrom">Από:</label>
-                <select id="transferFrom">
-                    <option value="thanasis">Θανάσης</option>
-                    <option value="ersi">Έρση</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="transferTo">Προς:</label>
-                <select id="transferTo">
-                    <option value="ersi">Έρση</option>
-                    <option value="thanasis">Θανάσης</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="transferDescription">Περιγραφή Μεταφοράς:</label>
-                <input type="text" id="transferDescription" placeholder="Π.χ. Επιστροφή χρημάτων">
-            </div>
-
-            <button class="transfer-button" onclick="transferFunds()">Μεταφορά</button>
-        </div>
-
-        <div class="history-section">
-            <h2 class="section-title">Ιστορικό Συναλλαγών</h2>
-            <ul id="transactionHistoryList" class="history-list">
-                </ul>
-        </div>
-
-        <button class="reset-button" onclick="resetPayments()">Επαναφορά Όλων</button>
-    </div>
-
-    <script>
-        let thanasisTotal = 0;
-        let ersiTotal = 0;
-        let transactionHistory = [];
-
-        // Load totals and history from local storage on page load
-        window.onload = function() {
-            if (localStorage.getItem('thanasisTotal')) {
-                thanasisTotal = parseFloat(localStorage.getItem('thanasisTotal'));
-            }
-            if (localStorage.getItem('ersiTotal')) {
-                ersiTotal = parseFloat(localStorage.getItem('ersiTotal'));
-            }
-            if (localStorage.getItem('transactionHistory')) {
-                transactionHistory = JSON.parse(localStorage.getItem('transactionHistory'));
-            }
-            updateDisplay();
-            renderHistory();
-        };
-
-        function addPayment() {
-            const amountInput = document.getElementById('amount');
-            const payerSelect = document.getElementById('payer');
-            const descriptionInput = document.getElementById('paymentDescription');
-
-            const amount = parseFloat(amountInput.value);
-            const payer = payerSelect.value;
-            const description = descriptionInput.value.trim();
-
-            if (isNaN(amount) || amount <= 0) {
-                alert('Παρακαλώ εισάγετε ένα έγκυρο θετικό ποσό για την πληρωμή.');
-                return;
-            }
-
-            const transaction = {
-                type: 'payment',
-                amount: amount,
-                from: payer,
-                to: null,
-                description: description,
-                timestamp: new Date().toISOString()
-            };
-
-            if (payer === 'thanasis') {
-                thanasisTotal += amount;
-            } else if (payer === 'ersi') {
-                ersiTotal += amount;
-            }
-
-            transactionHistory.push(transaction);
-            saveData();
-            updateDisplay();
-            renderHistory();
-            amountInput.value = '';
-            descriptionInput.value = '';
+      function Firework() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height * (0.4 + 0.5 * Math.random());
+        this.count = 48;
+        this.r = 2 + 3 * Math.random();
+        this.sparks = [];
+        let color = randomColor();
+        for (let i=0; i<this.count; i++) {
+          const angle = (i / this.count) * 2 * Math.PI;
+          const speed = 1 + 2 * Math.random();
+          this.sparks.push({
+            x: this.x, y: this.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            alpha: 1,
+            color,
+            decay: 0.013 + 0.02 * Math.random()
+          });
         }
+      }
+      Firework.prototype.update = function() {
+        this.sparks.forEach(s => {
+          s.x += s.vx;
+          s.y += s.vy;
+          s.vy += 0.021; // gravity
+          s.alpha -= s.decay;
+        });
+        // remove faded sparks
+        this.sparks = this.sparks.filter(s => s.alpha > 0.1);
+        return this.sparks.length > 0;
+      };
+      Firework.prototype.draw = function(ctx) {
+        this.sparks.forEach(s => {
+          ctx.save();
+          ctx.globalAlpha = Math.max(s.alpha,0);
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 2.7, 0, 2 * Math.PI);
+          ctx.fillStyle = s.color;
+          ctx.shadowColor = s.color;
+          ctx.shadowBlur = 12;
+          ctx.fill();
+          ctx.restore();
+        });
+      };
 
-        function transferFunds() {
-            const transferAmountInput = document.getElementById('transferAmount');
-            const transferFromSelect = document.getElementById('transferFrom');
-            const transferToSelect = document.getElementById('transferTo');
-            const transferDescriptionInput = document.getElementById('transferDescription');
+      // Λειτουργία Animation Loop
+      function loop() {
+        ctx.globalAlpha = 0.17;
+        ctx.fillStyle = '#fff0fa'; // ελαφρύ ροζ φόντο για fade
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
 
-            const amount = parseFloat(transferAmountInput.value);
-            const fromUser = transferFromSelect.value;
-            const toUser = transferToSelect.value;
-            const description = transferDescriptionInput.value.trim();
-
-            if (isNaN(amount) || amount <= 0) {
-                alert('Παρακαλώ εισάγετε ένα έγκυρο θετικό ποσό για τη μεταφορά.');
-                return;
-            }
-
-            if (fromUser === toUser) {
-                alert('Δεν μπορείτε να μεταφέρετε χρήματα στον ίδιο χρήστη.');
-                return;
-            }
-
-            let canTransfer = true;
-            if (fromUser === 'thanasis') {
-                if (thanasisTotal < amount) {
-                    alert('Ο Θανάσης δεν έχει επαρκές ποσό για αυτή τη μεταφορά.');
-                    canTransfer = false;
-                }
-            } else if (fromUser === 'ersi') {
-                if (ersiTotal < amount) {
-                    alert('Η Έρση δεν έχει επαρκές ποσό για αυτή τη μεταφορά.');
-                    canTransfer = false;
-                }
-            }
-
-            if (!canTransfer) return;
-
-            const transaction = {
-                type: 'transfer',
-                amount: amount,
-                from: fromUser,
-                to: toUser,
-                description: description,
-                timestamp: new Date().toISOString()
-            };
-
-            if (fromUser === 'thanasis') {
-                thanasisTotal -= amount;
-                ersiTotal += amount;
-            } else if (fromUser === 'ersi') {
-                ersiTotal -= amount;
-                thanasisTotal += amount;
-            }
-
-            transactionHistory.push(transaction);
-            saveData();
-            updateDisplay();
-            renderHistory();
-            transferAmountInput.value = '';
-            transferDescriptionInput.value = '';
+        // Νέα πυροτεχνήματα κατά βούληση
+        if (Math.random() < 0.12) {
+          fireworks.push(new Firework());
         }
+        // Update, draw, and remove any finished fireworks
+        fireworks = fireworks.filter(f => {
+          f.draw(ctx);
+          return f.update();
+        });
 
-        function deleteTransaction(index) {
-            if (!confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή τη συναλλαγή;')) {
-                return;
-            }
+        requestAnimationFrame(loop);
+      }
+      loop();
 
-            const transactionToDelete = transactionHistory[index];
-
-            if (transactionToDelete.type === 'payment') {
-                if (transactionToDelete.from === 'thanasis') {
-                    thanasisTotal -= transactionToDelete.amount;
-                } else if (transactionToDelete.from === 'ersi') {
-                    ersiTotal -= transactionToDelete.amount;
-                }
-            } else if (transactionToDelete.type === 'transfer') {
-                if (transactionToDelete.from === 'thanasis') {
-                    thanasisTotal += transactionToDelete.amount;
-                    ersiTotal -= transactionToDelete.amount;
-                } else if (transactionToDelete.from === 'ersi') {
-                    ersiTotal += transactionToDelete.amount;
-                    thanasisTotal -= transactionToDelete.amount;
-                }
-            }
-
-            transactionHistory.splice(index, 1);
-
-            saveData();
-            updateDisplay();
-            renderHistory();
-        }
-
-        function updateDisplay() {
-            document.getElementById('thanasisTotal').textContent = thanasisTotal.toFixed(2) + '€';
-            document.getElementById('ersiTotal').textContent = ersiTotal.toFixed(2) + '€';
-        }
-
-        function renderHistory() {
-            const historyList = document.getElementById('transactionHistoryList');
-            historyList.innerHTML = '';
-
-            transactionHistory.forEach((transaction, index) => {
-                const listItem = document.createElement('li');
-                let transactionText = '';
-
-                if (transaction.type === 'payment') {
-                    transactionText = `Πληρωμή: ${transaction.amount.toFixed(2)}€ από ${transaction.from === 'thanasis' ? 'Θανάση' : 'Έρση'}`;
-                    listItem.classList.add('payment');
-                } else if (transaction.type === 'transfer') {
-                    transactionText = `Μεταφορά: ${transaction.amount.toFixed(2)}€ από ${transaction.from === 'thanasis' ? 'Θανάση' : 'Έρση'} προς ${transaction.to === 'thanasis' ? 'Θανάση' : 'Έρση'}`;
-                    listItem.classList.add('transfer');
-                }
-
-                if (transaction.description) {
-                    transactionText += ` (${transaction.description})`;
-                }
-                
-                const date = new Date(transaction.timestamp);
-                transactionText += ` - ${date.toLocaleString('el-GR')}`;
-
-                const textSpan = document.createElement('span');
-                textSpan.textContent = transactionText;
-                listItem.appendChild(textSpan);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Διαγραφή';
-                deleteBtn.classList.add('delete-button');
-                deleteBtn.onclick = () => deleteTransaction(index);
-                listItem.appendChild(deleteBtn);
-
-                historyList.appendChild(listItem);
-            });
-            historyList.scrollTop = historyList.scrollHeight;
-        }
-
-        function saveData() {
-            localStorage.setItem('thanasisTotal', thanasisTotal.toFixed(2));
-            localStorage.setItem('ersiTotal', ersiTotal.toFixed(2));
-            localStorage.setItem('transactionHistory', JSON.stringify(transactionHistory));
-        }
-
-        function resetPayments() {
-            if (confirm('Είστε σίγουροι ότι θέλετε να επαναφέρετε όλες τις πληρωμές, τις μεταφορές και το ιστορικό;')) {
-                thanasisTotal = 0;
-                ersiTotal = 0;
-                transactionHistory = [];
-                localStorage.removeItem('thanasisTotal');
-                localStorage.removeItem('ersiTotal');
-                localStorage.removeItem('transactionHistory');
-                updateDisplay();
-                renderHistory();
-            }
-        }
-    </script>
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    }
+  </script>
 </body>
 </html>
